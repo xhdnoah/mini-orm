@@ -3,6 +3,7 @@ package orm
 import (
 	"errors"
 	"mini-orm/session"
+	"reflect"
 	"testing"
 )
 
@@ -64,4 +65,20 @@ func TestEngine_Transaction(t *testing.T) {
 	t.Run("commit", func(t *testing.T) {
 		transactionCommit(t)
 	})
+}
+
+func TestEngine_Migrate(t *testing.T) {
+	engine := OpenDB(t)
+	defer engine.Close()
+	s := engine.NewSession()
+	_, _ = s.Raw("DROP TABLE IF EXISTS User;").Exec()
+	_, _ = s.Raw("CREATE TABLE User(Name text PRIMARY KEY, XXX interger);").Exec()
+	_, _ = s.Raw("INSERT INTO User(`Name`) values (?), (?)", "Tom", "Sam").Exec()
+	engine.Migrate(&User{})
+
+	rows, _ := s.Raw("SELECT * FROM User").QueryRows()
+	columns, _ := rows.Columns()
+	if !reflect.DeepEqual(columns, []string{"Name", "Age"}) {
+		t.Fatal("failed to migrate table User, got columns ", columns)
+	}
 }
