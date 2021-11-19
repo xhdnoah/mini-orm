@@ -2,6 +2,7 @@ package session
 
 import (
 	"database/sql"
+	"mini-orm/clause"
 	"mini-orm/dialect"
 	"mini-orm/log"
 	"mini-orm/schema"
@@ -13,6 +14,7 @@ type Session struct {
 	db       *sql.DB
 	dialect  dialect.Dialect
 	refTable *schema.Schema
+	clause   clause.Clause
 	// 拼接 SQL 语句
 	sql strings.Builder
 	// SQL 语句中占位符的对应值
@@ -29,6 +31,7 @@ func New(db *sql.DB, dialect dialect.Dialect) *Session {
 func (s *Session) Clear() {
 	s.sql.Reset()
 	s.sqlVars = nil
+	s.clause = clause.Clause{}
 }
 
 func (s *Session) DB() *sql.DB {
