@@ -16,6 +16,9 @@ const (
 	LIMIT
 	WHERE
 	ORDERBY
+	UPDATE
+	DELETE
+	COUNT
 )
 
 // 根据 Type 调用对应 generator 生成子句对应 SQL: clause.Set(WHERE, "Name = ?", "Alice")
