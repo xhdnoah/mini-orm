@@ -29,6 +29,7 @@ func (s *Session) Insert(values ...interface{}) (int64, error) {
 
 // Find 根据已铺平字段的值构造出对象 session.Find(&[]User{})
 func (s *Session) Find(values interface{}) error {
+	s.CallMethod(BeforeQuery, nil)
 	destSlice := reflect.Indirect(reflect.ValueOf(values))
 	destType := destSlice.Type().Elem()                                   // 获取切片元素类型
 	table := s.Model(reflect.New(destType).Elem().Interface()).RefTable() // 根据类型映射表结构
@@ -52,6 +53,7 @@ func (s *Session) Find(values interface{}) error {
 		if err := rows.Scan(values...); err != nil {
 			return err
 		}
+		s.CallMethod(AfterQuery, dest.Addr().Interface())
 		destSlice.Set(reflect.Append(destSlice, dest))
 	}
 	return rows.Close()
